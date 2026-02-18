@@ -122,12 +122,14 @@ def extract_all_amenities(data):
     Also supports amenities nested deeper.
     Returns a flat list of amenity strings.
     """
-    found = []
+   found = []
 
     def walk(obj):
         if isinstance(obj, dict):
             for k, v in obj.items():
-                if normalize_key(k) == "amenities":
+                kn = normalize_key(str(k))
+                # Grab ANY amenity-like container, not just exact == "amenities"
+                if "amenit" in kn and isinstance(v, (dict, list)):
                     found.extend(_collect_strings(v))
                 walk(v)
         elif isinstance(obj, list):
@@ -136,7 +138,7 @@ def extract_all_amenities(data):
 
     walk(data)
 
-    # de-dupe final list while preserving order
+    # de-dupe while preserving order
     seen = set()
     res = []
     for s in found:
@@ -1023,7 +1025,8 @@ def main():
         title_edit = st.text_input("Title", value=title_val, key="__title")
 
         st.subheader("Amenities (ground truth)")
-        st.write(amenities_val if amenities_val else "—")
+        st.caption(f"Detected {len(amenities_val)} amenities")
+        safe_df(pd.DataFrame({"amenity": amenities_val})) if amenities_val else st.write("—")
 
     with c2:
         edited_texts: Dict[str, str] = {}
