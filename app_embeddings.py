@@ -122,7 +122,7 @@ def extract_all_amenities(data):
     Also supports amenities nested deeper.
     Returns a flat list of amenity strings.
     """
-   found = []
+    found = []
 
     def walk(obj):
         if isinstance(obj, dict):
